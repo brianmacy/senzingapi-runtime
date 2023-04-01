@@ -27,33 +27,42 @@ USER root
 
 ENV TERM=xterm
 
-# Install packages via apt.
-
-RUN apt-get update \
- && apt-get -y install \
-        wget
+RUN apt-get update
 
 # Install Senzing repository index.
 
-RUN wget -qO \
+RUN apt-get -y install wget \
+ && wget -qO \
         /${SENZING_APT_REPOSITORY_NAME} \
         ${SENZING_APT_REPOSITORY_URL}/${SENZING_APT_REPOSITORY_NAME} \
  && apt-get -y install \
         /${SENZING_APT_REPOSITORY_NAME} \
  && apt-get update \
- && rm /${SENZING_APT_REPOSITORY_NAME}
+ && rm /${SENZING_APT_REPOSITORY_NAME} \
+ && apt-get -y clean
 
 # Install Senzing package.
 
 RUN apt-get -y install \
-      libpq5 \
       ${SENZING_APT_INSTALL_PACKAGE} \
       jq \
- && apt-get clean
+ && apt-get -y clean
 
 # Set environment variables for root.
 
 ENV LD_LIBRARY_PATH=/opt/senzing/g2/lib
+
+# Install the oracle client
+RUN apt-get -y install curl unzip \
+ && curl -X GET \
+      --output /tmp/instantclient-basic-linuxx64.zip \
+      https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linuxx64.zip \
+ && unzip /tmp/instantclient-basic-linuxx64.zip -d /app \
+ && apt-get -y remove curl unzip \
+ && apt-get -y autoremove \
+ && apt-get -y clean
+
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/app/instantclient_21_9/
 
 # Add test file.
 
