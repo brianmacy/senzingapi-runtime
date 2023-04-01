@@ -53,12 +53,12 @@ RUN apt-get -y install \
 ENV LD_LIBRARY_PATH=/opt/senzing/g2/lib
 
 # Install the oracle client
-RUN apt-get -y install curl unzip \
- && curl -X GET \
-      --output /tmp/instantclient-basic-linuxx64.zip \
+RUN apt-get -y install unzip \
+ && wget \
+      -qO /tmp/instantclient-basic-linuxx64.zip \
       https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linuxx64.zip \
  && unzip /tmp/instantclient-basic-linuxx64.zip -d /app \
- && apt-get -y remove curl unzip \
+ && apt-get -y remove unzip \
  && apt-get -y autoremove \
  && apt-get -y clean
 
