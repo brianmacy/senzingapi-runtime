@@ -1,23 +1,17 @@
-ARG BASE_IMAGE=debian:11.6-slim@sha256:8eaee63a5ea83744e62d5bf88e7d472d7f19b5feda3bfc6a2304cc074f269269
+ARG BASE_IMAGE=debian:11-slim
 FROM ${BASE_IMAGE}
 
 # Create the build image.
 
 ARG SENZING_ACCEPT_EULA="I_ACCEPT_THE_SENZING_EULA"
-ARG SENZING_APT_INSTALL_PACKAGE="senzingapi-runtime=3.4.2-23039"
+ARG SENZING_APT_INSTALL_PACKAGE="senzingapi-runtime"
 ARG SENZING_APT_REPOSITORY_NAME="senzingrepo_1.0.1-1_amd64.deb"
 ARG SENZING_APT_REPOSITORY_URL="https://senzing-production-apt.s3.amazonaws.com"
-
-ENV REFRESHED_AT=2023-02-10
 
 ENV SENZING_ACCEPT_EULA=${SENZING_ACCEPT_EULA} \
     SENZING_APT_INSTALL_PACKAGE=${SENZING_APT_INSTALL_PACKAGE} \
     SENZING_APT_REPOSITORY_NAME=${SENZING_APT_REPOSITORY_NAME} \
     SENZING_APT_REPOSITORY_URL=${SENZING_APT_REPOSITORY_URL}
-
-LABEL Name="senzing/senzingapi-runtime" \
-      Maintainer="support@senzing.com" \
-      Version="3.4.2"
 
 # Run as "root" for system installation.
 
@@ -53,16 +47,15 @@ RUN apt-get -y install \
 ENV LD_LIBRARY_PATH=/opt/senzing/g2/lib
 
 # Install the oracle client
-RUN apt-get -y install unzip \
- && wget \
-      -qO /tmp/instantclient-basic-linuxx64.zip \
-      https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linuxx64.zip \
- && unzip /tmp/instantclient-basic-linuxx64.zip -d /app \
- && apt-get -y remove unzip \
+RUN wget -qO /etc/apt/trusted.gpg.d/microsoft.asc https://packages.microsoft.com/keys/microsoft.asc \
+ && wget -qO /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/11/prod.list \
+ && apt-get update \
+ && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+ && ACCEPT_EULA=Y apt-get install -y mssql-tools \
  && apt-get -y autoremove \
  && apt-get -y clean
 
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/app/instantclient_21_9/
+ENV PATH=$PATH:/opt/mssql-tools/bin
 
 # Add test file.
 
