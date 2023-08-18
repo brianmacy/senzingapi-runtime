@@ -25,7 +25,7 @@ RUN apt-get update
 
 # Install Senzing repository index.
 
-RUN apt-get -y install wget \
+RUN apt-get -y install wget unixodbc \
  && wget -qO \
         /${SENZING_APT_REPOSITORY_NAME} \
         ${SENZING_APT_REPOSITORY_URL}/${SENZING_APT_REPOSITORY_NAME} \
