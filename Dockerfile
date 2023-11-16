@@ -46,16 +46,16 @@ RUN apt-get -y install \
 
 ENV LD_LIBRARY_PATH=/opt/senzing/g2/lib
 
-# Install the oracle client
+# Install the mssql client
 RUN wget -qO /etc/apt/trusted.gpg.d/microsoft.asc https://packages.microsoft.com/keys/microsoft.asc \
  && wget -qO /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/11/prod.list \
  && apt-get update \
- && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
- && ACCEPT_EULA=Y apt-get install -y mssql-tools \
+ && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+ && ACCEPT_EULA=Y apt-get install -y mssql-tools18 \
  && apt-get -y autoremove \
  && apt-get -y clean
 
-ENV PATH=$PATH:/opt/mssql-tools/bin
+ENV PATH=$PATH:/opt/mssql-tools18/bin
 
 # Add test file.
 
